@@ -5,7 +5,7 @@ import differenceWith from "lodash/differenceWith";
 import intersectionWith from "lodash/intersectionWith";
 import { DataSet } from "vis-data";
 import { Network } from "vis-network";
-import uuid from "uuid";
+import { v4 as uuidv4 } from "uuid";
 import PropTypes from "prop-types";
 
 const diff = (current, next, field = "id") => {
@@ -35,14 +35,13 @@ const diff = (current, next, field = "id") => {
   };
 };
 
-
 class Graph extends Component {
   constructor(props) {
     super(props);
     const { identifier } = props;
     this.updateGraph = this.updateGraph.bind(this);
     this.state = {
-      identifier: identifier !== undefined ? identifier : uuid.v4()
+      identifier: identifier !== undefined ? identifier : uuidv4(),
     };
     this.container = React.createRef();
   }
@@ -63,8 +62,16 @@ class Graph extends Component {
 
     if (nodesChange) {
       const idIsEqual = (n1, n2) => n1.id === n2.id;
-      const nodesRemoved = differenceWith(this.props.graph.nodes, nextProps.graph.nodes, idIsEqual);
-      const nodesAdded = differenceWith(nextProps.graph.nodes, this.props.graph.nodes, idIsEqual);
+      const nodesRemoved = differenceWith(
+        this.props.graph.nodes,
+        nextProps.graph.nodes,
+        idIsEqual
+      );
+      const nodesAdded = differenceWith(
+        nextProps.graph.nodes,
+        this.props.graph.nodes,
+        idIsEqual
+      );
       const nodesChanged = differenceWith(
         differenceWith(nextProps.graph.nodes, this.props.graph.nodes, isEqual),
         nodesAdded
@@ -88,10 +95,12 @@ class Graph extends Component {
 
     if (eventsChange) {
       let events = this.props.events || {};
-      for (let eventName of Object.keys(events)) this.Network.off(eventName, events[eventName]);
+      for (let eventName of Object.keys(events))
+        this.Network.off(eventName, events[eventName]);
 
       events = nextProps.events || {};
-      for (let eventName of Object.keys(events)) this.Network.on(eventName, events[eventName]);
+      for (let eventName of Object.keys(events))
+        this.Network.on(eventName, events[eventName]);
     }
 
     return false;
@@ -116,7 +125,7 @@ class Graph extends Component {
   updateGraph() {
     let defaultOptions = {
       physics: {
-        stabilization: false
+        stabilization: false,
       },
       autoResize: false,
       edges: {
@@ -126,10 +135,10 @@ class Graph extends Component {
         arrows: {
           to: {
             enabled: true,
-            scaleFactor: 0.5
-          }
-        }
-      }
+            scaleFactor: 0.5,
+          },
+        },
+      },
     };
 
     // merge user provied options with our default ones
@@ -139,7 +148,7 @@ class Graph extends Component {
       this.container.current,
       Object.assign({}, this.props.graph, {
         edges: this.edges,
-        nodes: this.nodes
+        nodes: this.nodes,
       }),
       options
     );
@@ -171,7 +180,7 @@ class Graph extends Component {
       {
         id: identifier,
         ref: this.container,
-        style
+        style,
       },
       identifier
     );
@@ -180,7 +189,7 @@ class Graph extends Component {
 
 Graph.defaultProps = {
   graph: {},
-  style: { width: "100%", height: "100%" }
+  style: { width: "100%", height: "100%" },
 };
 Graph.propTypes = {
   graph: PropTypes.object,
